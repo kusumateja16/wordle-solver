@@ -20,3 +20,33 @@ def rank_candidates(words):
         )
 
     return sorted(scores, key=scores.get, reverse=True)
+import math
+from collections import Counter
+from solver.feedback import get_feedback
+
+
+def calculate_entropy(guess, possible_answers):
+    if not possible_answers:
+        return 0.0
+
+    patterns = Counter(
+        tuple(get_feedback(answer, guess))
+        for answer in possible_answers
+    )
+
+    total = len(possible_answers)
+    entropy = 0.0
+
+    for count in patterns.values():
+        probability = count / total
+        entropy -= probability * math.log2(probability)
+
+    return entropy
+
+
+def rank_by_information_gain(guesses, possible_answers):
+    return sorted(
+        guesses,
+        key=lambda guess: calculate_entropy(guess, possible_answers),
+        reverse=True
+    )
